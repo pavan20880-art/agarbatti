@@ -11,9 +11,8 @@ import {
   ShieldCheck, 
   Truck, 
   Tag,
-  AlertCircle
+  CheckCircle
 } from 'lucide-react';
-import { OrnamentalDivider } from '../common/OrnamentalDivider';
 
 interface CartDrawerProps {
   onOpenCheckout: () => void;
@@ -32,9 +31,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     updateQuantity, 
     clearCart,
     subtotal, 
-    taxAmount, 
-    shippingFee, 
-    totalAmount,
+    tax, 
+    shipping, 
+    discount,
+    appliedCoupon,
+    total,
     totalItemsCount 
   } = useCart();
 
@@ -64,7 +65,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           </div>
           <button
             onClick={closeCart}
-            className="p-1 rounded-full text-[#E6CA85] hover:text-white hover:bg-white/10"
+            className="p-1 rounded-full text-[#E6CA85] hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -75,7 +76,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           {subtotal >= 499 ? (
             <p className="text-emerald-800 font-bold flex items-center gap-1.5">
               <Truck className="w-3.5 h-3.5 text-emerald-700" />
-              <span>🎉 Congratulations! You have unlocked Free Retail Shipping!</span>
+              <span>🎉 Congratulations! You unlocked Free Delivery!</span>
             </p>
           ) : (
             <p className="text-stone-700">
@@ -99,7 +100,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </p>
               <button
                 onClick={closeCart}
-                className="px-5 py-2 rounded-lg bg-[#4A0E17] text-[#E6CA85] text-xs font-bold shadow hover:bg-[#5B131F] mt-2 cursor-pointer"
+                className="px-5 py-2 rounded-lg bg-[#4A0E17] text-[#E6CA85] text-xs font-bold shadow hover:bg-[#5B131F] mt-2 cursor-pointer transition-colors"
               >
                 Start Shopping
               </button>
@@ -111,8 +112,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 className="bg-white rounded-xl p-3 border border-[#C5A059]/30 shadow-2xs flex gap-3 relative"
               >
                 <img
-                  src={item.product.images[0]}
-                  alt={item.product.name}
+                  src={item.image || 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'}
+                  alt={item.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-16 h-16 rounded-lg object-cover bg-[#F4EDE2] flex-shrink-0"
                 />
 
@@ -120,15 +123,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <div className="flex items-start justify-between">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-[#78350F]">
-                        {item.product.brand}
+                        {item.brand}
                       </span>
                       <h5 className="text-xs font-bold text-[#1C1917] truncate max-w-[170px]">
-                        {item.product.name}
+                        {item.name}
                       </h5>
                     </div>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-stone-400 hover:text-rose-600 p-1"
+                      className="text-stone-400 hover:text-rose-600 p-1 transition-colors"
                       title="Remove Item"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -136,7 +139,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
 
                   <p className="text-[11px] text-stone-500">
-                    Size: <strong>{item.selectedSize.size}</strong> • {item.mode === 'bulk' ? '📦 Bulk Tier' : '🛒 Retail'}
+                    Size: <strong>{item.size}</strong> • {item.orderType === 'bulk' ? '📦 Bulk Tier' : '🛒 Retail'}
                   </p>
 
                   <div className="flex items-center justify-between pt-1">
@@ -162,10 +165,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     {/* Unit Total Price */}
                     <div className="text-right">
                       <span className="text-xs font-bold text-[#4A0E17]">
-                        ₹{(item.unitPrice * item.quantity).toLocaleString()}
+                        ₹{(item.price * item.quantity).toLocaleString()}
                       </span>
                       <span className="text-[10px] text-stone-400 block">
-                        ₹{item.unitPrice}/each
+                        ₹{item.price}/each
                       </span>
                     </div>
                   </div>
@@ -186,19 +189,28 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <span>Subtotal:</span>
                 <span className="font-semibold text-stone-900">₹{subtotal.toLocaleString()}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-emerald-700 font-semibold">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    <span>Coupon Discount ({appliedCoupon?.code}):</span>
+                  </span>
+                  <span>-₹{discount.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span>Estimated GST (5%):</span>
-                <span className="font-semibold text-stone-900">₹{taxAmount.toLocaleString()}</span>
+                <span>GST Tax (5%):</span>
+                <span className="font-semibold text-stone-900">₹{tax.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Shipping:</span>
+                <span>Delivery / Shipping:</span>
                 <span className="font-semibold text-stone-900">
-                  {shippingFee === 0 ? <span className="text-emerald-700 font-bold">FREE</span> : `₹${shippingFee}`}
+                  {shipping === 0 ? <span className="text-emerald-700 font-bold">FREE</span> : `₹${shipping}`}
                 </span>
               </div>
               <div className="flex justify-between pt-1 border-t border-stone-200 text-sm font-bold text-[#4A0E17]">
                 <span>Grand Total:</span>
-                <span className="text-base font-serif">₹{totalAmount.toLocaleString()}</span>
+                <span className="text-base font-serif">₹{total.toLocaleString()}</span>
               </div>
             </div>
 
@@ -206,7 +218,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="flex justify-end">
               <button
                 onClick={clearCart}
-                className="text-[11px] text-stone-400 hover:text-rose-600 underline"
+                className="text-[11px] text-stone-400 hover:text-rose-600 underline cursor-pointer"
               >
                 Clear Cart
               </button>

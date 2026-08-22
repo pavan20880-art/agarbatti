@@ -177,6 +177,7 @@ export interface ConsultationRequest {
 
 export interface User {
   id: string;
+  uid?: string;
   fullName: string;
   email: string;
   phone: string;
@@ -184,7 +185,9 @@ export interface User {
   businessName?: string;
   gstNumber?: string;
   businessType?: 'Individual / Pooja Store' | 'Retailer' | 'Wholesaler / Distributor' | 'Agarbatti Manufacturer' | 'Institution / Temple Trust';
+  role?: 'customer' | 'admin';
   addresses: DeliveryAddress[];
   savedProductIds: string[];
   createdAt: string;
+  updatedAt?: string;
 }

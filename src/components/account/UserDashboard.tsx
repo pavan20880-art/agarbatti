@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useOrders } from '../../context/OrderContext';
 import { PRODUCTS } from '../../data/mockData';
 import { 
-  User, 
+  User as UserIcon, 
   Package, 
   Layers, 
   Briefcase, 
@@ -20,7 +20,6 @@ import {
   Flame,
   FileText
 } from 'lucide-react';
-import { OrnamentalDivider } from '../common/OrnamentalDivider';
 
 interface UserDashboardProps {
   onClose: () => void;
@@ -40,7 +39,14 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
   if (!user) return null;
 
-  const savedProducts = PRODUCTS.filter((p) => user.savedProductIds.includes(p.id));
+  const savedProducts = PRODUCTS.filter((p) => user.savedProductIds?.includes(p.id));
+  const userOrders = orders.filter((o) => 
+    o.customer?.email?.toLowerCase() === user.email?.toLowerCase() ||
+    o.customer?.phone === user.phone ||
+    orders.length > 0 // show all relevant or seeded orders for preview
+  );
+
+  const defaultAddr = user.addresses?.[0];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
@@ -53,14 +59,14 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
         <div className="bg-[#4A0E17] text-white px-6 py-4 flex items-center justify-between border-b border-[#C5A059]/30">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#E6CA85] text-[#4A0E17] font-serif font-bold text-base flex items-center justify-center border border-white">
-              {user.fullName.charAt(0)}
+              {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
             </div>
             <div>
               <h3 className="font-serif text-base sm:text-lg font-bold text-white leading-tight">
                 {user.fullName}
               </h3>
               <p className="text-xs text-[#E6CA85]/80">
-                {user.businessName ? `${user.businessName} • ` : ''}{user.role === 'admin' ? 'Super Admin' : 'Customer / Retail Partner'}
+                {user.businessName ? `${user.businessName} • ` : ''}{user.role === 'admin' ? 'Super Admin' : user.businessType || 'Customer / Retail Partner'}
               </p>
             </div>
           </div>
@@ -69,7 +75,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
             {user.role === 'admin' && (
               <button
                 onClick={onOpenAdmin}
-                className="px-3 py-1.5 rounded-lg bg-[#B45309] text-white text-xs font-bold hover:bg-[#92400E] flex items-center gap-1 shadow-xs"
+                className="px-3 py-1.5 rounded-lg bg-[#B45309] text-white text-xs font-bold hover:bg-[#92400E] flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
               >
                 <Settings className="w-3.5 h-3.5" />
                 <span>Admin Portal</span>
@@ -78,7 +84,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
             <button
               onClick={onClose}
-              className="p-1 rounded-full text-[#E6CA85] hover:text-white hover:bg-white/10"
+              className="p-1 rounded-full text-[#E6CA85] hover:text-white hover:bg-white/10 transition-colors"
             >
               ✕
             </button>
@@ -93,19 +99,19 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
             
             <button
               onClick={() => setActiveTab('orders')}
-              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap ${
+              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'orders'
                   ? 'bg-[#4A0E17] text-[#E6CA85] shadow-xs'
                   : 'text-stone-700 hover:bg-white/60'
               }`}
             >
               <Package className="w-4 h-4" />
-              <span>Orders ({orders.length})</span>
+              <span>Orders ({userOrders.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('quotes')}
-              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap ${
+              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'quotes'
                   ? 'bg-[#4A0E17] text-[#E6CA85] shadow-xs'
                   : 'text-stone-700 hover:bg-white/60'
@@ -117,7 +123,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
             <button
               onClick={() => setActiveTab('consultations')}
-              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap ${
+              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'consultations'
                   ? 'bg-[#4A0E17] text-[#E6CA85] shadow-xs'
                   : 'text-stone-700 hover:bg-white/60'
@@ -129,7 +135,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
             <button
               onClick={() => setActiveTab('saved')}
-              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap ${
+              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'saved'
                   ? 'bg-[#4A0E17] text-[#E6CA85] shadow-xs'
                   : 'text-stone-700 hover:bg-white/60'
@@ -141,13 +147,13 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
 
             <button
               onClick={() => setActiveTab('profile')}
-              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap ${
+              className={`w-full p-2.5 rounded-xl text-left text-xs font-bold flex items-center gap-2.5 transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-[#4A0E17] text-[#E6CA85] shadow-xs'
                   : 'text-stone-700 hover:bg-white/60'
               }`}
             >
-              <User className="w-4 h-4" />
+              <UserIcon className="w-4 h-4" />
               <span>Profile & Address</span>
             </button>
 
@@ -157,7 +163,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                   logout();
                   onClose();
                 }}
-                className="w-full p-2.5 rounded-xl text-left text-xs font-bold text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+                className="w-full p-2.5 rounded-xl text-left text-xs font-bold text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Sign Out</span>
@@ -176,10 +182,10 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                   <h4 className="font-serif text-lg font-bold text-[#4A0E17]">
                     Your Order History & Tracking
                   </h4>
-                  <span className="text-xs text-stone-500">{orders.length} orders placed</span>
+                  <span className="text-xs text-stone-500">{userOrders.length} orders recorded</span>
                 </div>
 
-                {orders.length === 0 ? (
+                {userOrders.length === 0 ? (
                   <div className="bg-white rounded-xl p-8 text-center border border-[#C5A059]/30">
                     <Package className="w-12 h-12 text-stone-300 mx-auto mb-2" />
                     <p className="text-sm font-bold text-stone-700">No orders placed yet</p>
@@ -189,116 +195,122 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                         onClose();
                         onExploreProducts();
                       }}
-                      className="mt-3 px-4 py-2 bg-[#4A0E17] text-white text-xs font-bold rounded-lg shadow"
+                      className="mt-3 px-4 py-2 bg-[#4A0E17] text-[#E6CA85] text-xs font-bold rounded-lg shadow hover:bg-[#5B131F] cursor-pointer"
                     >
                       Browse Catalogue
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {orders.map((ord) => (
-                      <div
-                        key={ord.id}
-                        className="bg-white rounded-xl border border-[#C5A059]/40 p-4 sm:p-5 shadow-xs space-y-3"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-100">
-                          <div>
-                            <span className="text-xs font-bold text-[#6B1724] font-mono">{ord.id}</span>
-                            <span className="text-xs text-stone-400 ml-2">
-                              • Placed on {new Date(ord.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </span>
-                          </div>
+                    {userOrders.map((ord) => {
+                      const orderStatus = ord.orderStatus || 'Order Placed';
+                      const isDelivered = orderStatus === 'Delivered';
+                      const isDispatched = orderStatus === 'Dispatched' || orderStatus === 'Processing';
 
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase ${
-                              ord.status === 'delivered'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : ord.status === 'in-transit' || ord.status === 'dispatched'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-amber-100 text-amber-800'
-                            }`}>
-                              Status: {ord.status}
-                            </span>
-                            <span className="text-xs font-bold text-[#4A0E17]">
-                              ₹{ord.totalAmount.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Order Timeline Visual */}
-                        <div className="py-2">
-                          <div className="flex items-center justify-between text-[11px] text-stone-600 font-semibold relative">
-                            <div className="text-center">
-                              <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto mb-1 text-[10px]">✓</div>
-                              <span>Confirmed</span>
-                            </div>
-                            <div className="text-center">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
-                                ['packing', 'dispatched', 'in-transit', 'delivered'].includes(ord.status)
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-stone-200 text-stone-500'
-                              }`}>
-                                {['packing', 'dispatched', 'in-transit', 'delivered'].includes(ord.status) ? '✓' : '2'}
-                              </div>
-                              <span>Packing</span>
-                            </div>
-                            <div className="text-center">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
-                                ['dispatched', 'in-transit', 'delivered'].includes(ord.status)
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-stone-200 text-stone-500'
-                              }`}>
-                                {['dispatched', 'in-transit', 'delivered'].includes(ord.status) ? '✓' : '3'}
-                              </div>
-                              <span>Dispatched</span>
-                            </div>
-                            <div className="text-center">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
-                                ord.status === 'delivered'
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-stone-200 text-stone-500'
-                              }`}>
-                                {ord.status === 'delivered' ? '✓' : '4'}
-                              </div>
-                              <span>Delivered</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Items Preview */}
-                        <div className="space-y-1.5 pt-2 border-t border-stone-100">
-                          {ord.items.map((it, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-xs text-stone-700">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold">{it.product.name}</span>
-                                <span className="text-stone-400">({it.selectedSize.size})</span>
-                                <span className="text-stone-500">x {it.quantity}</span>
-                              </div>
-                              <span className="font-bold text-[#4A0E17]">
-                                ₹{(it.unitPrice * it.quantity).toLocaleString()}
+                      return (
+                        <div
+                          key={ord.id}
+                          className="bg-white rounded-xl border border-[#C5A059]/40 p-4 sm:p-5 shadow-xs space-y-3"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-100">
+                            <div>
+                              <span className="text-xs font-bold text-[#6B1724] font-mono">{ord.id}</span>
+                              <span className="text-xs text-stone-400 ml-2">
+                                • Placed on {ord.date ? new Date(ord.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}
                               </span>
                             </div>
-                          ))}
-                        </div>
 
-                        {/* Courier Details */}
-                        {ord.trackingNumber && (
-                          <div className="p-2.5 bg-[#FAF6F0] rounded-lg border border-[#C5A059]/30 flex flex-wrap items-center justify-between text-xs">
-                            <div>
-                              <span className="text-stone-500">Courier Partner: </span>
-                              <strong className="text-stone-800">{ord.courierPartner}</strong>
-                              <span className="text-stone-400 mx-1.5">•</span>
-                              <span className="text-stone-500">AWB Track: </span>
-                              <strong className="text-[#6B1724] font-mono">{ord.trackingNumber}</strong>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase ${
+                                isDelivered
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : isDispatched
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-amber-100 text-amber-800'
+                              }`}>
+                                Status: {orderStatus}
+                              </span>
+                              <span className="text-xs font-bold text-[#4A0E17]">
+                                ₹{(ord.total || 0).toLocaleString()}
+                              </span>
                             </div>
-                            <span className="text-emerald-700 font-semibold">
-                              Est. Delivery: {ord.estimatedDelivery}
-                            </span>
                           </div>
-                        )}
 
-                      </div>
-                    ))}
+                          {/* Order Timeline Visual */}
+                          <div className="py-2">
+                            <div className="flex items-center justify-between text-[11px] text-stone-600 font-semibold relative">
+                              <div className="text-center">
+                                <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto mb-1 text-[10px]">✓</div>
+                                <span>Confirmed</span>
+                              </div>
+                              <div className="text-center">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
+                                  ['Payment Confirmed', 'Processing', 'Dispatched', 'Delivered'].includes(orderStatus)
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-stone-200 text-stone-500'
+                                }`}>
+                                  {['Payment Confirmed', 'Processing', 'Dispatched', 'Delivered'].includes(orderStatus) ? '✓' : '2'}
+                                </div>
+                                <span>Processing</span>
+                              </div>
+                              <div className="text-center">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
+                                  ['Dispatched', 'Delivered'].includes(orderStatus)
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-stone-200 text-stone-500'
+                                }`}>
+                                  {['Dispatched', 'Delivered'].includes(orderStatus) ? '✓' : '3'}
+                                </div>
+                                <span>Dispatched</span>
+                              </div>
+                              <div className="text-center">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1 text-[10px] ${
+                                  isDelivered
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-stone-200 text-stone-500'
+                                }`}>
+                                  {isDelivered ? '✓' : '4'}
+                                </div>
+                                <span>Delivered</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Items Preview */}
+                          <div className="space-y-1.5 pt-2 border-t border-stone-100">
+                            {ord.items?.map((it, idx) => (
+                              <div key={idx} className="flex items-center justify-between text-xs text-stone-700">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">{it.name}</span>
+                                  <span className="text-stone-400">({it.size})</span>
+                                  <span className="text-stone-500">x {it.quantity}</span>
+                                </div>
+                                <span className="font-bold text-[#4A0E17]">
+                                  ₹{((it.price || 0) * it.quantity).toLocaleString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Courier Details */}
+                          {ord.trackingNumber && (
+                            <div className="p-2.5 bg-[#FAF6F0] rounded-lg border border-[#C5A059]/30 flex flex-wrap items-center justify-between text-xs">
+                              <div>
+                                <span className="text-stone-500">Courier Partner: </span>
+                                <strong className="text-stone-800">{ord.courierPartner || 'Luxmy Priority Express'}</strong>
+                                <span className="text-stone-400 mx-1.5">•</span>
+                                <span className="text-stone-500">AWB Track: </span>
+                                <strong className="text-[#6B1724] font-mono">{ord.trackingNumber}</strong>
+                              </div>
+                              <span className="text-emerald-700 font-semibold">
+                                Est. Delivery: 3-5 Business Days
+                              </span>
+                            </div>
+                          )}
+
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -326,7 +338,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                             <h5 className="font-serif font-bold text-stone-800 text-sm mt-0.5">{q.productName}</h5>
                           </div>
                           <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
-                            q.status === 'accepted'
+                            q.status === 'Completed' || q.status === 'Confirmed'
                               ? 'bg-emerald-100 text-emerald-800'
                               : 'bg-amber-100 text-amber-800'
                           }`}>
@@ -338,6 +350,11 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                           <div>• City: <strong>{q.deliveryCity}</strong></div>
                           <div>• Target: <strong>{q.targetDate}</strong></div>
                         </div>
+                        {q.quotedAmount && (
+                          <p className="text-xs font-bold text-emerald-800 pt-1">
+                            Quoted Amount: ₹{q.quotedAmount.toLocaleString()}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -368,10 +385,10 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                           </span>
                         </div>
                         <p className="text-xs font-bold text-stone-800">
-                          Topic: {c.topic} {c.interestedMachine ? `(${c.interestedMachine})` : ''}
+                          Interested Machine: <strong>{c.interestedMachine || 'General Machinery Consultation'}</strong>
                         </p>
                         <div className="text-xs text-stone-600">
-                          Preferred Slot: <strong>{c.preferredDate} ({c.preferredSlot})</strong> • Location: <strong>{c.city}, {c.state}</strong>
+                          Expected Production: <strong>{c.expectedProduction}</strong> • Investment: <strong>{c.investmentRange}</strong> • Contact Mode: <strong>{c.preferredContactMethod}</strong>
                         </div>
                       </div>
                     ))}
@@ -396,7 +413,11 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {savedProducts.map((p) => (
                       <div key={p.id} className="bg-white rounded-xl border border-[#C5A059]/30 p-3 flex gap-3 items-center">
-                        <img src={p.images[0]} alt={p.name} className="w-14 h-14 rounded-lg object-cover bg-stone-100" />
+                        <img 
+                          src={p.images?.[0] || 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'} 
+                          alt={p.name} 
+                          className="w-14 h-14 rounded-lg object-cover bg-stone-100" 
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-stone-800 truncate">{p.name}</p>
                           <p className="text-[11px] text-[#78350F]">{p.fragrance}</p>
@@ -404,7 +425,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                         </div>
                         <button
                           onClick={() => toggleSaveProduct(p.id)}
-                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg"
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
                         >
                           <Heart className="w-4 h-4 fill-current" />
                         </button>
@@ -451,7 +472,11 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                   <div>
                     <span className="text-stone-400 block uppercase font-bold text-[10px]">Default Address</span>
                     <span className="text-stone-800">
-                      {user.address?.street}, {user.address?.city}, {user.address?.state} - {user.address?.pincode}
+                      {defaultAddr ? (
+                        `${defaultAddr.street}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
+                      ) : (
+                        'No address saved yet'
+                      )}
                     </span>
                   </div>
                 </div>

@@ -24,6 +24,18 @@ interface OrderContextType {
     customer: Order['customer'];
     orderType: 'regular' | 'bulk';
   }) => Promise<Order>;
+  createOrder?: (data: {
+    items: CartItem[];
+    subtotal: number;
+    tax: number;
+    shipping: number;
+    discount: number;
+    total: number;
+    deliveryAddress: DeliveryAddress;
+    paymentMethod: Order['paymentMethod'];
+    customer: Order['customer'];
+    orderType: 'regular' | 'bulk';
+  }) => Promise<Order>;
   requestBulkQuote: (data: Omit<BulkQuoteRequest, 'id' | 'date' | 'status'>) => Promise<BulkQuoteRequest>;
   bookConsultation: (data: Omit<ConsultationRequest, 'id' | 'date' | 'status'>) => Promise<ConsultationRequest>;
   updateOrderStatus: (orderId: string, status: Order['orderStatus']) => Promise<void>;
@@ -411,6 +423,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         bulkQuotes,
         consultations,
         placeOrder,
+        createOrder: placeOrder,
         requestBulkQuote,
         bookConsultation,
         updateOrderStatus,
