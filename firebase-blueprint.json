@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered user profile and business details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID (auth uid)" },
+        "fullName": { "type": "string", "description": "User's full name" },
+        "email": { "type": "string", "description": "User email address" },
+        "phone": { "type": "string", "description": "Primary phone number" },
+        "whatsapp": { "type": "string", "description": "WhatsApp contact number" },
+        "businessName": { "type": "string", "description": "Optional business or enterprise name" },
+        "gstNumber": { "type": "string", "description": "Optional GSTIN number" },
+        "businessType": { "type": "string", "description": "Business profile category" },
+        "role": { "type": "string", "description": "User role (admin or customer)" },
+        "addresses": { "type": "array", "description": "Saved delivery addresses" },
+        "savedProductIds": { "type": "array", "description": "Wishlist product IDs" },
+        "createdAt": { "type": "string", "description": "Creation ISO date" },
+        "lastLoginAt": { "type": "string", "description": "Last activity timestamp" }
+      },
+      "required": ["id", "fullName", "email", "phone", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order ID" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "date": { "type": "string", "description": "Order date" },
+        "orderType": { "type": "string", "description": "regular or bulk" },
+        "items": { "type": "array", "description": "Purchased items" },
+        "subtotal": { "type": "number", "description": "Subtotal" },
+        "tax": { "type": "number", "description": "Tax" },
+        "shipping": { "type": "number", "description": "Shipping fee" },
+        "discount": { "type": "number", "description": "Discount" },
+        "total": { "type": "number", "description": "Total amount" },
+        "deliveryAddress": { "type": "object", "description": "Shipping address" },
+        "paymentMethod": { "type": "string", "description": "Payment mode" },
+        "paymentId": { "type": "string", "description": "Transaction reference" },
+        "paymentStatus": { "type": "string", "description": "Payment status" },
+        "orderStatus": { "type": "string", "description": "Current dispatch status" },
+        "customer": { "type": "object", "description": "Customer contact info" },
+        "timeline": { "type": "array", "description": "Order progress logs" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "date", "items", "total", "orderStatus"]
+    },
+    "BulkQuoteRequest": {
+      "title": "BulkQuoteRequest",
+      "description": "B2B wholesale price quotation enquiry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Enquiry ID" },
+        "userId": { "type": "string", "description": "Optional user ID" },
+        "date": { "type": "string", "description": "Enquiry date" },
+        "productName": { "type": "string", "description": "Product name" },
+        "brand": { "type": "string", "description": "Brand" },
+        "category": { "type": "string", "description": "Category" },
+        "quantityBoxes": { "type": "number", "description": "Box count" },
+        "cartonCount": { "type": "number", "description": "Cartons" },
+        "targetDate": { "type": "string", "description": "Required target delivery" },
+        "businessName": { "type": "string", "description": "Enterprise name" },
+        "gstNumber": { "type": "string", "description": "GST number" },
+        "contactName": { "type": "string", "description": "Contact person name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "whatsapp": { "type": "string", "description": "WhatsApp number" },
+        "email": { "type": "string", "description": "Email address" },
+        "deliveryCity": { "type": "string", "description": "Destination city" },
+        "deliveryState": { "type": "string", "description": "Destination state" },
+        "additionalNotes": { "type": "string", "description": "Notes" },
+        "status": { "type": "string", "description": "Quote status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "contactName", "phone", "businessName", "quantityBoxes"]
+    },
+    "ConsultationRequest": {
+      "title": "ConsultationRequest",
+      "description": "Machinery and manufacturing feasibility enquiry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Consultation ID" },
+        "userId": { "type": "string", "description": "Optional user ID" },
+        "date": { "type": "string", "description": "Booking date" },
+        "fullName": { "type": "string", "description": "Full name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "whatsapp": { "type": "string", "description": "WhatsApp number" },
+        "email": { "type": "string", "description": "Email address" },
+        "city": { "type": "string", "description": "City" },
+        "state": { "type": "string", "description": "State" },
+        "businessExperience": { "type": "string", "description": "Background" },
+        "interestedMachine": { "type": "string", "description": "Selected machine model" },
+        "expectedProduction": { "type": "string", "description": "Capacity" },
+        "investmentRange": { "type": "string", "description": "Budget" },
+        "preferredContactMethod": { "type": "string", "description": "Communication channel" },
+        "message": { "type": "string", "description": "Query details" },
+        "status": { "type": "string", "description": "Status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "fullName", "phone", "interestedMachine"]
+    }
+  },
+  "firestoreRules": "rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function isAuthenticated() {\n      return request.auth != null;\n    }\n    function isOwner(userId) {\n      return isAuthenticated() && request.auth.uid == userId;\n    }\n    \n    // User Profiles\n    match /users/{userId} {\n      allow read: if isAuthenticated();\n      allow create: if isAuthenticated() && request.auth.uid == userId;\n      allow update, delete: if isOwner(userId);\n    }\n    \n    // Orders\n    match /orders/{orderId} {\n      allow read: if isAuthenticated();\n      allow create: if true;\n      allow update, delete: if isAuthenticated();\n    }\n    \n    // Wholesale Quotes\n    match /bulk_quotes/{quoteId} {\n      allow read, write: if true;\n    }\n    \n    // Consultations\n    match /consultations/{consultationId} {\n      allow read, write: if true;\n    }\n  }\n}"
+}

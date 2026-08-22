@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Order, BulkQuoteRequest, ConsultationRequest, DeliveryAddress, CartItem } from '../types';
+import { db } from '../lib/firebase';
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  onSnapshot 
+} from 'firebase/firestore';
 
 interface OrderContextType {
   orders: Order[];
@@ -19,9 +26,9 @@ interface OrderContextType {
   }) => Promise<Order>;
   requestBulkQuote: (data: Omit<BulkQuoteRequest, 'id' | 'date' | 'status'>) => Promise<BulkQuoteRequest>;
   bookConsultation: (data: Omit<ConsultationRequest, 'id' | 'date' | 'status'>) => Promise<ConsultationRequest>;
-  updateOrderStatus: (orderId: string, status: Order['orderStatus']) => void;
-  updateBulkQuoteStatus: (quoteId: string, status: BulkQuoteRequest['status'], quotedAmount?: number) => void;
-  updateConsultationStatus: (consultId: string, status: ConsultationRequest['status']) => void;
+  updateOrderStatus: (orderId: string, status: Order['orderStatus']) => Promise<void>;
+  updateBulkQuoteStatus: (quoteId: string, status: BulkQuoteRequest['status'], quotedAmount?: number) => Promise<void>;
+  updateConsultationStatus: (consultId: string, status: ConsultationRequest['status']) => Promise<void>;
   getOrderById: (orderId: string) => Order | undefined;
 }
 
@@ -178,6 +185,59 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
+  // Realtime Cloud Firestore listeners for multi-device sync
+  useEffect(() => {
+    try {
+      const ordersCol = collection(db, 'orders');
+      const unsubOrders = onSnapshot(ordersCol, (snapshot) => {
+        if (!snapshot.empty) {
+          const list: Order[] = [];
+          snapshot.forEach((d) => list.push(d.data() as Order));
+          // Merge unique with SEED
+          const combined = [...list];
+          SEED_ORDERS.forEach(seed => {
+            if (!combined.some(o => o.id === seed.id)) combined.push(seed);
+          });
+          setOrders(combined);
+        }
+      }, (err) => console.warn('Firestore orders sync note:', err));
+
+      const quotesCol = collection(db, 'bulk_quotes');
+      const unsubQuotes = onSnapshot(quotesCol, (snapshot) => {
+        if (!snapshot.empty) {
+          const list: BulkQuoteRequest[] = [];
+          snapshot.forEach((d) => list.push(d.data() as BulkQuoteRequest));
+          const combined = [...list];
+          SEED_BULK_QUOTES.forEach(seed => {
+            if (!combined.some(q => q.id === seed.id)) combined.push(seed);
+          });
+          setBulkQuotes(combined);
+        }
+      }, (err) => console.warn('Firestore quotes sync note:', err));
+
+      const consultCol = collection(db, 'consultations');
+      const unsubConsult = onSnapshot(consultCol, (snapshot) => {
+        if (!snapshot.empty) {
+          const list: ConsultationRequest[] = [];
+          snapshot.forEach((d) => list.push(d.data() as ConsultationRequest));
+          const combined = [...list];
+          SEED_CONSULTATIONS.forEach(seed => {
+            if (!combined.some(c => c.id === seed.id)) combined.push(seed);
+          });
+          setConsultations(combined);
+        }
+      }, (err) => console.warn('Firestore consult sync note:', err));
+
+      return () => {
+        unsubOrders();
+        unsubQuotes();
+        unsubConsult();
+      };
+    } catch (e) {
+      console.warn('Realtime listeners initialization note:', e);
+    }
+  }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
@@ -247,6 +307,14 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setOrders((prev) => [newOrder, ...prev]);
+
+    // Save to Cloud Firestore so it reflects on all devices
+    try {
+      await setDoc(doc(db, 'orders', orderId), newOrder);
+    } catch (e) {
+      console.warn('Order cloud sync note:', e);
+    }
+
     return newOrder;
   };
 
@@ -261,6 +329,14 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       assignedManager: 'Senior Wholesale Specialist'
     };
     setBulkQuotes((prev) => [newQuote, ...prev]);
+
+    // Cloud Firestore Sync
+    try {
+      await setDoc(doc(db, 'bulk_quotes', quoteId), newQuote);
+    } catch (e) {
+      console.warn('Bulk quote cloud sync note:', e);
+    }
+
     return newQuote;
   };
 
@@ -274,16 +350,29 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       status: 'New'
     };
     setConsultations((prev) => [newConsult, ...prev]);
+
+    // Cloud Firestore Sync
+    try {
+      await setDoc(doc(db, 'consultations', consultId), newConsult);
+    } catch (e) {
+      console.warn('Consultation cloud sync note:', e);
+    }
+
     return newConsult;
   };
 
-  const updateOrderStatus = (orderId: string, status: Order['orderStatus']) => {
+  const updateOrderStatus = async (orderId: string, status: Order['orderStatus']) => {
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, orderStatus: status } : o))
     );
+    try {
+      await setDoc(doc(db, 'orders', orderId), { orderStatus: status }, { merge: true });
+    } catch (e) {
+      console.warn('Order status sync error:', e);
+    }
   };
 
-  const updateBulkQuoteStatus = (quoteId: string, status: BulkQuoteRequest['status'], quotedAmount?: number) => {
+  const updateBulkQuoteStatus = async (quoteId: string, status: BulkQuoteRequest['status'], quotedAmount?: number) => {
     setBulkQuotes((prev) =>
       prev.map((q) =>
         q.id === quoteId
@@ -291,12 +380,24 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           : q
       )
     );
+    try {
+      const payload: any = { status };
+      if (quotedAmount !== undefined) payload.quotedAmount = quotedAmount;
+      await setDoc(doc(db, 'bulk_quotes', quoteId), payload, { merge: true });
+    } catch (e) {
+      console.warn('Quote status sync error:', e);
+    }
   };
 
-  const updateConsultationStatus = (consultId: string, status: ConsultationRequest['status']) => {
+  const updateConsultationStatus = async (consultId: string, status: ConsultationRequest['status']) => {
     setConsultations((prev) =>
       prev.map((c) => (c.id === consultId ? { ...c, status } : c))
     );
+    try {
+      await setDoc(doc(db, 'consultations', consultId), { status }, { merge: true });
+    } catch (e) {
+      console.warn('Consultation status sync error:', e);
+    }
   };
 
   const getOrderById = (orderId: string) => {
