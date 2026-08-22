@@ -1,4 +1,19 @@
 import { Product, Machine, BrandPartner, MachineManufacturer } from '../types';
+import prodImg1 from '../assets/images/regenerated_image_1787364347692.png';
+import prodImg2 from '../assets/images/regenerated_image_1787364353075.png';
+import prodImg3 from '../assets/images/regenerated_image_1787364357879.png';
+import prodImg4 from '../assets/images/regenerated_image_1787364718460.png';
+import prodImg5 from '../assets/images/regenerated_image_1787364363002.png';
+import prodImg6 from '../assets/images/regenerated_image_1787364732285.png';
+import prodImg7 from '../assets/images/regenerated_image_1787364371713.png';
+import prodImg8 from '../assets/images/regenerated_image_1787364367915.png';
+import prodImg9 from '../assets/images/regenerated_image_1787364375623.png';
+import prodImg10 from '../assets/images/regenerated_image_1787364379976.png';
+import prodImg11 from '../assets/images/regenerated_image_1787364383939.png';
+import machImg1 from '../assets/images/regenerated_image_1787365432280.png';
+import machImg2 from '../assets/images/regenerated_image_1787365448117.png';
+import machImg3 from '../assets/images/regenerated_image_1787365466499.png';
+import machImg4 from '../assets/images/regenerated_image_1787365486512.png';
 
 export const PRODUCTS: Product[] = [
   {
@@ -18,7 +33,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 312,
     images: [
-      'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80',
+      prodImg1,
       'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80'
     ],
@@ -54,7 +69,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 240,
     images: [
-      'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80',
+      prodImg2,
       'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -88,7 +103,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 420,
     images: [
-      'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=800&q=80',
+      prodImg3,
       'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -123,7 +138,7 @@ export const PRODUCTS: Product[] = [
     rating: 5.0,
     reviewsCount: 180,
     images: [
-      'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&w=800&q=80',
+      prodImg4,
       'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -157,7 +172,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 155,
     images: [
-      'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=800&q=80',
+      prodImg5,
       'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -190,7 +205,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 98,
     images: [
-      'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80',
+      prodImg6,
       'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -224,6 +239,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 164,
     images: [
+      prodImg7,
       'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -255,6 +271,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.6,
     reviewsCount: 510,
     images: [
+      prodImg8,
       'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -286,6 +303,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 380,
     images: [
+      prodImg9,
       'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -317,6 +335,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 132,
     images: [
+      prodImg10,
       'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -348,6 +367,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 205,
     images: [
+      prodImg11,
       'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&w=800&q=80'
     ],
     sizeOptions: [
@@ -384,7 +404,7 @@ export const MACHINES: Machine[] = [
     priceRange: '₹85,000 - ₹1,15,000 + GST',
     approxInvestment: '₹1.5 - 2.5 Lakh (including raw materials & starter batch)',
     images: [
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+      machImg1,
       'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'The benchmark entry-to-growth machinery for small-to-medium incense manufacturers. Engineered with hardened alloy steel piston sleeves and an automated bamboo stick feeder that minimizes stick breakage and ensures uniform diameter coating (8" or 9" sticks).',
@@ -423,7 +443,7 @@ export const MACHINES: Machine[] = [
     priceRange: '₹1,45,000 - ₹1,85,000 + GST',
     approxInvestment: '₹3.5 - 5 Lakh (including mixer, dryer tray setup & raw stocks)',
     images: [
-      'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
+      machImg2,
       'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'Industrial-grade workhorse engineered for commercial agarbatti factories and B2B contract manufacturers. Features a dual-sensor stick reject system that automatically skips warped sticks without stopping the extruder.',
@@ -461,6 +481,7 @@ export const MACHINES: Machine[] = [
     priceRange: '₹1,65,000 - ₹2,10,000 + GST',
     approxInvestment: '₹2.8 - 4.5 Lakh',
     images: [
+      machImg3,
       'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'Precision hydraulic molding machine for producing high-density backflow cones, standard dhoop cones, and sambrani cup blanks. Uniform compression ensures even burning without crumbling.',
@@ -497,6 +518,7 @@ export const MACHINES: Machine[] = [
     priceRange: '₹1,20,000 - ₹1,75,000 + GST',
     approxInvestment: '₹2.5 - 3.8 Lakh',
     images: [
+      machImg4,
       'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80'
     ],
     description: 'High-speed rotary press designed for pharmaceutical-grade clean pressing of pure camphor powders into circular discs, square blocks, and devotional tablets with crisp embossing.',

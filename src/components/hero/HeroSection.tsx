@@ -1,6 +1,8 @@
 import React from 'react';
 import { ArrowRight, Sparkles, PhoneCall, ChevronRight } from 'lucide-react';
 import { OrnamentalDivider } from '../common/OrnamentalDivider';
+import heroTraditionImg from '../../assets/images/regenerated_image_1787369446932.png';
+import heroMachineryImg from '../../assets/images/regenerated_image_1787369450897.png';
 
 interface HeroSectionProps {
   onExploreProducts: () => void;
@@ -95,7 +97,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* LEFT SIDE: Indian Incense Tradition */}
             <div className="relative overflow-hidden group min-h-[220px] lg:min-h-[460px]">
               <img
-                src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=1200&q=85"
+                src={heroTraditionImg}
                 alt="Indian Temple & Incense Tradition"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000"
               />
@@ -121,7 +123,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* RIGHT SIDE: Modern Agarbatti Machinery */}
             <div className="relative overflow-hidden group min-h-[220px] lg:min-h-[460px]">
               <img
-                src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=85"
+                src={heroMachineryImg}
                 alt="Modern Agarbatti Manufacturing Machinery"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000"
               />
