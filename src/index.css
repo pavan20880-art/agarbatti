@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-marcellus: 'Marcellus', serif;
+    --font-cinzel: 'Cinzel', serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #1c1917;
+    background-color: #faf6f0;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-title {
+    font-family: var(--font-marcellus);
+  }
+
+  .font-display {
+    font-family: var(--font-cinzel);
+  }
+}
+
+/* Custom Indian Ornamental & Atmospheric Helpers */
+.bg-parchment {
+  background-color: #faf6f0;
+  background-image: radial-gradient(rgba(180, 83, 9, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 40%, #78350f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.maroon-gradient {
+  background: linear-gradient(135deg, #5b131f 0%, #3e0c15 100%);
+}
+
+.gold-border {
+  border: 1px solid rgba(197, 160, 89, 0.35);
+}
+
+.gold-border-glow:hover {
+  border-color: rgba(217, 119, 6, 0.6);
+  box-shadow: 0 10px 30px -10px rgba(180, 83, 9, 0.15);
+}
+
+/* Incense Smoke Animation */
+@keyframes smokeWave {
+  0% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-30px) scaleX(1.15) scaleY(1.1) skewX(4deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-70px) scaleX(1.3) scaleY(1.2) skewX(-4deg);
+    opacity: 0;
+  }
+}
+
+.animate-smoke {
+  animation: smokeWave 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-smoke-delayed {
+  animation: smokeWave 9s cubic-bezier(0.4, 0, 0.2, 1) infinite 2.5s;
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: gentleFloat 5s ease-in-out infinite;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f5efeb;
+}
+::-webkit-scrollbar-thumb {
+  background: #c5a059;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9a7332;
+}
